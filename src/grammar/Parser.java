@@ -1,5 +1,6 @@
 package grammar;
 
+import util.IO;
 import lexic.Scan;
 import lexic.Token;
 import lexic.TokenType;
@@ -34,7 +35,7 @@ public class Parser {
 	private TreeNode declaration() {
 		TreeNode t = new TreeNode();
 		t.C0=typeSpec();
-		t.strValue = token.toString();
+		t.strValue = token.getToken().toString();
 		match(TokenType.ID);
 		if (token.isType(TokenType.SEMI)){
 			t.setType(NodeType.VARDECL);
@@ -52,6 +53,7 @@ public class Parser {
 			t.C1 = paramlist();
 			match(TokenType.RPAREN);
 			t.C2 = compound();
+			t.C2.setType(NodeType.FUNCOMPUND);
 		}
 		return t;
 	}
@@ -339,7 +341,7 @@ public class Parser {
 			match(TokenType.INT);
 			t.setType(NodeType.INTTYPESPEC);
 		}else{
-			err("declaration must have typeSpecifiler");
+			IO.err("declaration must have typeSpecifiler");
 		}
 		return t;
 	}
@@ -347,11 +349,8 @@ public class Parser {
 		if (token.getType().equals(expected)) {
 			token = scan.getToken();
 		} else {
-			err("ERROR:expect");
+			IO.err("ERROR:expect");
 		}
 	}
-	public void err(String msg){
-		System.err.println(msg);
-		System.exit(1);
-	}
+
 }

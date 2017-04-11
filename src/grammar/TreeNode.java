@@ -4,7 +4,7 @@ package grammar;
 public class TreeNode {
 	public static int globalIndex = 0;
 	public int localIndex = 0;
-	private NodeType nodeType;
+	public NodeType nodeType;
 	/*for declaration:ID name
 	 * */
 	public String strValue;

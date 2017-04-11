@@ -3,6 +3,7 @@ package cminus;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import codegen.AstToNasm;
 import grammar.Parser;
 import grammar.TreeNode;
 import lexic.Scan;
@@ -11,13 +12,19 @@ import lexic.TokenType;
 public class Main {
 
 	public static void main(String[] args) {
-		if (args.length!=1){
+		if (args.length==0){
 			System.err.println("ERROR:no input file");
+			System.exit(1);
+		}else if (args.length==1){
+			System.err.println("ERROR:no output file");
+			System.exit(1);
+		}else if (args.length>2){
+			System.err.println("ERROR:too many args");
 			System.exit(1);
 		}
 		/*lexical analysis*/
 		Scan scan = new Scan(args[0]);
-		scan.setTraceScan(true);
+		scan.setTraceScan(false);
 		/*grammatical analysis*/
 		Parser parser = new Parser(scan);
 		TreeNode root = parser.parse();
@@ -25,6 +32,10 @@ public class Main {
 		DotWriter dotWriter = new DotWriter(args[0]+".dot");
 		dotWriter.write(root);
 		dotWriter.close();
+		
+		AstToNasm genNasm = new AstToNasm(args[1]);
+		genNasm.genCode(root);
+		genNasm.close();
 	}
 	public static void dot(String file,TreeNode root){
 		file = file+".dot";
