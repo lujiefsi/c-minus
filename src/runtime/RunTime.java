@@ -1,0 +1,52 @@
+package runtime;
+import grammar.NodeType;
+import grammar.TreeNode;
+import semantic.Process;
+import semantic.Symbol;
+import semantic.SymbolTable;
+import util.IO;
+public class RunTime {
+	private final int VARSIZE = 4;
+	TreeNode root;
+	SymbolTable globalSymbolTable;
+	SymbolTable currentSymbolTable = null;
+	int offset = 8;
+	public RunTime(TreeNode root,SymbolTable symbolTable){
+		this.root = root;
+		this.globalSymbolTable = symbolTable;
+	}
+	public void run() {
+		new Process(){
+			@Override
+			public void postProc(TreeNode t) {
+				
+			}
+
+			@Override
+			public void preProc(TreeNode t) {
+				if (t == null) return;
+				if (t.nodeType.equals(NodeType.FUNDECL)){
+					currentSymbolTable = globalSymbolTable.lookUp(t.strValue).symbolTable;
+				}else if (t.nodeType.equals(NodeType.VARDECL)){
+					Symbol symbol = currentSymbolTable.lookUp(t.strValue);
+					symbol.offset = offset;
+					offset+=VARSIZE;
+				}else if (t.nodeType.equals(NodeType.ARRAYDECL)){
+					Symbol symbol = currentSymbolTable.lookUp(t.strValue);
+					symbol.offset = offset;
+					offset+=VARSIZE*symbol.arrayMax;
+				}
+				
+			}
+
+			@Override
+			public void finProc(TreeNode t) {
+				if (t.nodeType.equals(NodeType.ARRAYPARM)||t.nodeType.equals(NodeType.VARPARM)){
+					Symbol symbol = currentSymbolTable.lookUp(t.strValue);
+					symbol.offset = offset;
+					offset+=VARSIZE;
+				}
+			}
+		}.traverse(root);
+	}
+}

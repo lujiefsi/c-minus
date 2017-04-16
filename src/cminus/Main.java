@@ -3,6 +3,8 @@ package cminus;
 import java.io.FileWriter;
 import java.io.IOException;
 
+import runtime.RunTime;
+import semantic.Analysis;
 import codegen.AstToNasm;
 import grammar.Parser;
 import grammar.TreeNode;
@@ -32,9 +34,13 @@ public class Main {
 		DotWriter dotWriter = new DotWriter(args[0]+".dot");
 		dotWriter.write(root);
 		dotWriter.close();
-		
-		AstToNasm genNasm = new AstToNasm(args[1]);
-		genNasm.genCode(root);
+		//*semantic analysis*/
+		Analysis analysis = new Analysis(root);
+		analysis.analysis();
+		RunTime runTime = new RunTime(root,analysis.getGlobalSymbolTable());
+		runTime.run();
+		AstToNasm genNasm = new AstToNasm(args[1],analysis.getGlobalSymbolTable());
+		genNasm.genCode(root,false);
 		genNasm.close();
 	}
 	public static void dot(String file,TreeNode root){

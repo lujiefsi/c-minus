@@ -22,7 +22,8 @@ public class Parser {
 	private TreeNode program() {
 		TreeNode t = new TreeNode();
 		t.setType(NodeType.PROGRAM);
-		TreeNode p = t;
+		t.C0 = declarationList();
+		TreeNode p = t.C0;
 		while (!token.isType(TokenType.ENDFILE)){
 			TreeNode q = declaration();
 			if (q!=null){
@@ -32,7 +33,18 @@ public class Parser {
 		}
 		return t;
 	}
+	private TreeNode declarationList(){
+		TreeNode t = declaration();
+		TreeNode p  = t,q;
+		while (p!= null){
+			q = declaration();
+			p.sibling = q;
+			p = q;
+		}
+		return t;
+	}
 	private TreeNode declaration() {
+		if (!token.isType(TokenType.INT)) return null;
 		TreeNode t = new TreeNode();
 		t.C0=typeSpec();
 		t.strValue = token.getToken().toString();
@@ -61,18 +73,13 @@ public class Parser {
 		TreeNode t = new TreeNode();
 		t.setType(NodeType.COMPUND);
 		match(TokenType.LBRACE);
-		while (token.isType(TokenType.INT)){
-			t.C0 = declaration();
-		}
-		if (!token.isType(TokenType.RBRACE)){
-			t.C1 = statementlist();
-		}
+		t.C0 = declarationList();
+		t.C1 = statementlist();
 		match(TokenType.RBRACE);
 		return t;
 	}
 	private TreeNode statementlist() {
-		TreeNode t = new TreeNode();
-		t.setType(NodeType.STATEMENTLIST);
+		TreeNode t = statement();
 		TreeNode p  = t,q;
 		while (p!= null){
 			q = statement();
@@ -218,7 +225,7 @@ public class Parser {
 				break;
 			case ID:
 				t= new TreeNode();
-				t.strValue = token.toString();
+				t.strValue = token.getToken().toString();
 				match(TokenType.ID);
 				if (token.isType(TokenType.LPAREN)){
 					t.setType(NodeType.CALL);
@@ -250,7 +257,6 @@ public class Parser {
 			if (root == null){
 				root = p;
 			}
-			p.setType(NodeType.args);
 			if (q!=null){
 				q.sibling = p;
 			}
@@ -299,29 +305,26 @@ public class Parser {
 		
 	}
 	private TreeNode paramlist() {
-		TreeNode t = new TreeNode();
-		t.setType(NodeType.PARMLIST);
 		if (token.getType().equals(TokenType.VOID)){
 			match(TokenType.VOID);
-			return t;
+			return null;
 		}
-		TreeNode p = t,q;
-		while (true){
+		TreeNode t = param(),p,q;
+		p = t;
+		while (p!=null){
 			q = param();
 			p.sibling = q;
 			p = q;
-			if (token.isType(TokenType.COMMA)){
-				match(TokenType.COMMA);
-			}else{
-				break;
-			}
 		}
 		return t;
 	}
 	private TreeNode param() {
+		if (token.isType(TokenType.RPAREN)){
+			return null;
+		}
 		TreeNode t = new TreeNode();
 		t.C0 = typeSpec();
-		t.strValue=token.toString();
+		t.strValue=token.getToken().toString();
 		match(TokenType.ID);
 		if (token.isType(TokenType.LSQU)){
 			match(TokenType.LSQU);
@@ -329,6 +332,9 @@ public class Parser {
 			t.setType(NodeType.ARRAYPARM);
 		}else{
 			t.setType(NodeType.VARPARM);
+			if (token.isType(TokenType.COMMA)){
+				match(TokenType.COMMA);
+			}
 		}
 		return t;
 	}

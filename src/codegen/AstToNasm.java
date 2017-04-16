@@ -1,18 +1,23 @@
 package codegen;
 
+import semantic.Symbol;
 import semantic.SymbolTable;
 import grammar.NodeType;
 import grammar.TreeNode;
 
 public class AstToNasm {
 	NasmCode nc = null;
-	private SymbolTable globals; 
+	int labelno = 0;
+	int label0;
+	int label1;
+	private SymbolTable globalSymbolTable; 
+	private SymbolTable currentSymbolTable;
 	private long currentFun=0;
-	public AstToNasm(String file) {
+	public AstToNasm(String file,SymbolTable globalSymbolTable) {
+		this.globalSymbolTable = globalSymbolTable;
 		nc = new NasmCode(file);
-		globals = new SymbolTable();
 	}
-	public void genCode(TreeNode node) {
+	public void genCode(TreeNode node,boolean signal) {
 		if (node == null){
 			return;
 		}
@@ -21,9 +26,9 @@ public class AstToNasm {
 			case PROGRAM:
 				//TODO:rename the var
 				globalVars(node);
-				t = node.sibling;
+				t = node.C0;
 				while( t != null ) {
-					genCode( t );
+					genCode(t,signal);
 					t = t.sibling;
 				}
 				break;
@@ -39,14 +44,47 @@ public class AstToNasm {
 					nc.code_end_func(Util.ELFHash("input"));
 				}*/
 				currentFun = Util.ELFHash(node.strValue);
+				currentSymbolTable = globalSymbolTable.lookUp(node.strValue).symbolTable;
 				nc.code_start_func(currentFun);
-				genCode(node.C2);
+				genCode(node.C2,signal);
 				break;
 			case FUNCOMPUND:
-				genCode(node.sibling);
+				genCode(node.C0,signal);
+				genCode(node.C1,signal);
 				nc.code_end_func(currentFun);
+				break;
+			case IFSTMT:
+				label0 = creat_label();
+				genCode(node.C0,true);
+				nc.code_pop(1);
+				nc.code_test_condition(1,0,label0);
+				break;
+			case EQ:
+				genCode(node.C0,true);
+				genCode(node.C1,true);
+				binaryCode(1,2,NodeType.EQ,signal);
+				break;
+			case VAR:
+				Symbol symbol = currentSymbolTable.lookUp(node.strValue);
+				if (symbol == null){
+					symbol = globalSymbolTable.lookUp(node.strValue);
+				}
+				if (signal){
+					nc.code_push_ind(symbol.offset);
+				}
+				break;
+			case CONST:
+				nc.code_push_cons(node.numValue);
 		default:
 			break;
+		}
+	}
+	private void binaryCode(int reg1,int reg2, NodeType eq,boolean signal) {
+		nc.code_pop(reg2);
+		nc.code_pop(reg1);
+		nc.code_op_binary(reg1,reg2,NodeType.EQ);
+		if (signal){
+			nc.code_push_reg(1,false);
 		}
 	}
 	private void globalVars(TreeNode node) {
@@ -68,5 +106,8 @@ public class AstToNasm {
 		if (nc!=null){
 			nc.close();
 		}
+	}
+	int creat_label(){
+		return ++labelno;
 	}
 }

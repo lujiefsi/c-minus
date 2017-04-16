@@ -1,16 +1,18 @@
 package semantic;
 
-import grammar.TreeNode;
+import java.util.HashMap;
+import java.util.Map;
 
-import java.util.ArrayList;
-import java.util.List;
-
-public class SymbolTable {
-	List<TreeNode> tabel = null;
+public class SymbolTable{
+	Map<String,Symbol> table = null;
 	public SymbolTable(){
-		tabel = new ArrayList<TreeNode>();
+		table = new HashMap<String,Symbol>();
 	}
-	public void insert(TreeNode node) {
-		
+	public void insert(String name,Symbol symbol) {
+		table.put(name, symbol);
+	}
+	public Symbol lookUp(String name){
+		Symbol ret = table.get(name);
+		return ret;
 	}
 }

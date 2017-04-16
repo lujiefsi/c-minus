@@ -1,5 +1,7 @@
 package codegen;
 
+import grammar.NodeType;
+
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.PrintWriter;
@@ -95,5 +97,57 @@ public class NasmCode {
 		emitCode("G3:\ncmp dword [ebp-4], 0\njnz G4\nmov eax, 4\nmov ebx, 1\nlea ecx, [numbers+10]");
 		emitCode("mov edx, 1\nint 80h");
 		
+	}
+	public void code_push_ind(int offset) {
+		emitCode("push\tdword "+getVarStr(offset));
+		
+	}
+	private String getVarStr(int offset){
+		return offset>=0?"[ebp+"+offset+"]":"[ebp-"+offset+"]";
+	}
+	public void code_push_cons(int num){
+		emitCode("push\tdword "+num);
+	}
+	public void code_pop(int reg) {
+		emitCode("pop\t"+getRegStr(reg));
+	}
+	private String getRegStr(int reg){
+		switch (reg) {
+		case 1:
+			return "eax";
+		case 2:
+			return "ebx";
+		case 3:
+			return "ecx";
+		case 4:
+			return "edx";
+		}
+
+		return null;
+	}
+	public void code_op_binary(int reg1, int reg2, NodeType op) {
+		String regStr1 = getRegStr(reg1);
+		String regStr2 = getRegStr(reg2);
+		if (op.equals(NodeType.PLUS)){
+			
+		}else{
+			emitCode("cmp\t"+regStr1+" "+regStr2);
+			if (op.equals(NodeType.EQ)){
+				emitCode("sete\t al");
+			}
+			emitCode("movzx\teax,al");
+		}
+	}
+	public void code_push_reg(int reg, boolean mem) {
+		String regStr = getRegStr(reg);
+		if (mem){
+			emitCode("push\tdword ["+regStr+"]");
+		}else{
+			emitCode("push\tdword "+regStr);
+		}
+	}
+	public void code_test_condition(int reg, int test, int label) {
+		emitCode("cmp\t"+getRegStr(reg)+", "+test);
+		emitCode("je\tL"+label);
 	}
 }
