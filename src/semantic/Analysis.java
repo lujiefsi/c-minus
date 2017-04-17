@@ -63,6 +63,18 @@ public class Analysis {
 						symbol.symbolTable = new SymbolTable();
 						currentSymbolTable.insert(node.strValue, symbol);
 						break;
+					case ARRAYPARM:
+						symbol = currentSymbolTable.lookUp(node.strValue);
+						if (symbol == null){
+							symbol = new Symbol();
+						}else{
+							IO.err(node.strValue+" aleardy del\n");
+						}
+						symbol.entryType = NodeType.ARRAYPARM;
+						symbol.ID = node.strValue;
+						symbol.symbolTable = new SymbolTable();
+						currentSymbolTable.insert(node.strValue, symbol);
+						break;
 					case VARDECL:
 						symbol = currentSymbolTable.lookUp(node.strValue);
 						if (symbol == null){
@@ -84,7 +96,7 @@ public class Analysis {
 						}
 						symbol.entryType = NodeType.ARRAYDECL;
 						symbol.dataType = node.C0.nodeType;
-						symbol.arrayMax = node.C1.numValue;
+						symbol.arrayMax = node.numValue;
 						symbol.ID = node.strValue;
 						currentSymbolTable.insert(node.strValue, symbol);
 						break;

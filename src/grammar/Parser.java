@@ -22,7 +22,7 @@ public class Parser {
 	private TreeNode program() {
 		TreeNode t = new TreeNode();
 		t.setType(NodeType.PROGRAM);
-		t.C0 = declarationList();
+		t.C0 = declaration();
 		TreeNode p = t.C0;
 		while (!token.isType(TokenType.ENDFILE)){
 			TreeNode q = declaration();
@@ -34,6 +34,7 @@ public class Parser {
 		return t;
 	}
 	private TreeNode declarationList(){
+		
 		TreeNode t = declaration();
 		TreeNode p  = t,q;
 		while (p!= null){
@@ -44,7 +45,9 @@ public class Parser {
 		return t;
 	}
 	private TreeNode declaration() {
-		if (!token.isType(TokenType.INT)) return null;
+		if (!token.isType(TokenType.INT)&&!token.isType(TokenType.VOID)){
+			return null;
+		}
 		TreeNode t = new TreeNode();
 		t.C0=typeSpec();
 		t.strValue = token.getToken().toString();
@@ -330,6 +333,9 @@ public class Parser {
 			match(TokenType.LSQU);
 			match(TokenType.RSQU);
 			t.setType(NodeType.ARRAYPARM);
+			if (token.isType(TokenType.COMMA)){
+				match(TokenType.COMMA);
+			}
 		}else{
 			t.setType(NodeType.VARPARM);
 			if (token.isType(TokenType.COMMA)){

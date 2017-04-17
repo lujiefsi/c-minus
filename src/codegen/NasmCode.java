@@ -37,7 +37,7 @@ public class NasmCode {
 	}
 
 	public void code_declare_global_var(String varname, int size) {
-		emitCode("D_"+varname+":\t"+"resw "+2*size);
+		emitCode("D_"+Util.ELFHash(varname)+":\t"+"resw "+2*size);
 	}
 	public boolean code_data_section() {
 		if (!data_mark){
@@ -60,7 +60,7 @@ public class NasmCode {
 		if (Util.func_is_main(funcname)) {
 			emitCode("global _start\n_start:");
 		} else {
-			emitCode("global F_"+funcname+"\nF_"+funcname);
+			emitCode("global F_"+funcname+"\nF_"+funcname+":");
 		}
 		emitCode("push\tebp");
 		emitCode("mov\tebp, esp");
@@ -103,7 +103,7 @@ public class NasmCode {
 		
 	}
 	private String getVarStr(int offset){
-		return offset>=0?"[ebp+"+offset+"]":"[ebp-"+offset+"]";
+		return offset>=0?"[ebp+"+offset+"]":"[ebp"+offset+"]";
 	}
 	public void code_push_cons(int num){
 		emitCode("push\tdword "+num);
@@ -129,13 +129,26 @@ public class NasmCode {
 		String regStr1 = getRegStr(reg1);
 		String regStr2 = getRegStr(reg2);
 		if (op.equals(NodeType.PLUS)){
-			
-		}else{
-			emitCode("cmp\t"+regStr1+" "+regStr2);
+			emitCode("lea\teax, ["+regStr1+"+"+regStr2+"]");
+		}else if (op.equals(NodeType.MINUS)){
+			emitCode("sub\t"+regStr1+", "+regStr2);
+		}else if (op.equals(NodeType.MULT)){
+			emitCode("imul\t"+regStr1+","+regStr2);
+		}else if (op.equals(NodeType.OVER)){
+			emitCode("mov\tedx,"+regStr1);
+			emitCode("sar\tedx,31");
+			emitCode("idiv\t"+regStr2);
+		}
+		else{
+			emitCode("cmp\t"+regStr1+", "+regStr2);
 			if (op.equals(NodeType.EQ)){
-				emitCode("sete\t al");
+				emitCode("sete\tal");
+			}else if (op.equals(NodeType.LT)){
+				emitCode("setl\tal");
+			}else if (op.equals(NodeType.LE)){
+				emitCode("setle\tal");
 			}
-			emitCode("movzx\teax,al");
+			emitCode("movzx\teax, al");
 		}
 	}
 	public void code_push_reg(int reg, boolean mem) {
@@ -149,5 +162,62 @@ public class NasmCode {
 	public void code_test_condition(int reg, int test, int label) {
 		emitCode("cmp\t"+getRegStr(reg)+", "+test);
 		emitCode("je\tL"+label);
+	}
+	public void code_jmp(int label) {
+		emitCode("jmp\tL"+label);
+	}
+	public void code_label(int label) {
+		emitCode("L"+label+":");
+	}
+	public void code_call_func(long currentFun) {
+		emitCode("call\tF_"+currentFun);
+	}
+	public void code_clean_stack(int height) {
+		emitCode("add\tesp, "+height);
+	}
+	public void code_sub_esp(int size) {
+		emitCode("sub\tesp, "+size);
+	}
+	public void code_op_assign(int target, int source) {
+		emitCode("mov\tdword ["+getRegStr(target)+"], "+getRegStr(source));
+	}
+	public void code_lea_local(int reg, int offset) {
+		emitCode("lea\t"+getRegStr(reg)+", "+getVarStr(offset));
+	}
+	public void code_push_global_array(long elfHash) {
+		emitCode("push\tdword D_"+elfHash);
+	}
+	public void code_lea_global(int target, long addr, int offset) {
+		String array = getRegStr(offset);
+		if (array ==null){
+			emitCode("lea\t"+getRegStr(target)+", [D_"+addr+"]");
+		}else{
+			emitCode("lea\t"+getRegStr(target)+", [D_"+addr+"+"+array+"]");
+		}
+	}
+	public void code_get_array_offset(int baseoff, int reg, int varLength, int global) {
+		String regStr = getRegStr(reg);
+		if (global==0){
+			emitCode("mov\tebx,ebp");
+		}else if (global == -1){
+			emitCode("mov\tebx, [ebp+"+baseoff+"]");
+		}else{
+			emitCode("mov\tebx, 0");
+		}
+		emitCode("imul\t"+regStr+", "+varLength);
+		emitCode("add\tebx, eax");
+		if (global == 0){
+			emitCode("sub\t,ebx, "+Math.abs(baseoff));
+		}
+	}
+	public void code_move_reg(int target, int source) {
+		if (target == source) return;
+		emitCode("move\t"+getRegStr(target)+","+getRegStr(source));
+	}
+	public void code_push_mem(long addr, int reg) {
+		emitCode("push\tdword [D_"+addr+"+"+getRegStr(reg)+"]");
+	}
+	public void code_push_global_var(long var) {
+		emitCode("push\tdword [D_"+var+"]");
 	}
 }

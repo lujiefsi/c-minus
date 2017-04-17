@@ -11,6 +11,7 @@ public class RunTime {
 	SymbolTable globalSymbolTable;
 	SymbolTable currentSymbolTable = null;
 	int offset = 8;
+	int localOffset = -4;
 	public RunTime(TreeNode root,SymbolTable symbolTable){
 		this.root = root;
 		this.globalSymbolTable = symbolTable;
@@ -25,12 +26,19 @@ public class RunTime {
 			@Override
 			public void preProc(TreeNode t) {
 				if (t == null) return;
-				if (t.nodeType.equals(NodeType.FUNDECL)){
+				if (t.nodeType.equals(NodeType.PROGRAM)){
+					currentSymbolTable = globalSymbolTable;
+				}else if (t.nodeType.equals(NodeType.FUNDECL)){
 					currentSymbolTable = globalSymbolTable.lookUp(t.strValue).symbolTable;
+					offset = 8;
+					localOffset = -4;
 				}else if (t.nodeType.equals(NodeType.VARDECL)){
-					Symbol symbol = currentSymbolTable.lookUp(t.strValue);
-					symbol.offset = offset;
-					offset+=VARSIZE;
+					Symbol symbol = globalSymbolTable.lookUp(t.strValue);
+					if (symbol==null){
+						symbol = currentSymbolTable.lookUp(t.strValue);
+						symbol.offset = localOffset;
+						localOffset-=VARSIZE;
+					}
 				}else if (t.nodeType.equals(NodeType.ARRAYDECL)){
 					Symbol symbol = currentSymbolTable.lookUp(t.strValue);
 					symbol.offset = offset;
