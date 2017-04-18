@@ -5,7 +5,7 @@ import grammar.NodeType;
 public class Symbol {
 	public String ID; //The lexeme
 	public NodeType entryType; //variable, array, etc.
-	public NodeType dataType; //INT or VOID
+	public DataType dataType; //INT or VOID
 	public int blockLevel; //The nesting level: 0 is unnested, 1 is a single level deep, etc.
 	public NodeType returnType; //For functions: INT or VOID
 	public int arrayMax; //The size of an array

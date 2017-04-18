@@ -2,6 +2,7 @@ package lexic;
 
 public class Token {
 	private String token = "";
+	private int lineNo = 0;
 	private TokenType tokeType = null;
 	public Token(String token){
 		this.token = token;
@@ -128,4 +129,11 @@ public class Token {
 		}
 		return tokenString.toString();
 	}
+	public int getLineNo(){
+		return lineNo;
+	}
+	public void setLineNo(int lineNo){
+		this.lineNo = lineNo;
+	}
+	
 }

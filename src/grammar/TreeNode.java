@@ -1,10 +1,14 @@
 package grammar;
 
+import semantic.DataType;
+
 
 public class TreeNode {
-	public static int globalIndex = 0;
-	public int localIndex = 0;
+	public static int glogalIndex = 0;
+	public int lineNo = 0;
+	public int index = 0;
 	public NodeType nodeType;
+	public DataType dataType;
 	/*for declaration:ID name
 	 * */
 	public String strValue;
@@ -14,7 +18,7 @@ public class TreeNode {
 	public TreeNode C1;
 	public TreeNode C2;
 	public TreeNode(){
-		localIndex = globalIndex++;
+		index = glogalIndex++;
 	}
 	public NodeType getType(){
 		return nodeType;

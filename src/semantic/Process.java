@@ -13,11 +13,10 @@ public abstract class Process {
 		traverse(t.sibling);
 		finProc(t);
 	}
-
-	public abstract void postProc(TreeNode t);
-
-	public abstract void preProc(TreeNode t);
+	public abstract void preProc(TreeNode node);
 	
-	public abstract void finProc(TreeNode t);
+	public abstract void postProc(TreeNode node);
+	
+	public abstract void finProc(TreeNode node);
 	
 }

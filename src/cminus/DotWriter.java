@@ -7,7 +7,6 @@ import java.io.IOException;
 
 public class DotWriter {
 	FileWriter fileWriter = null;
-	private int index = 0;
 	public DotWriter(String file) {
 		try {
 			fileWriter = new FileWriter(file);
@@ -20,25 +19,25 @@ public class DotWriter {
 	public void write(TreeNode root) {
 		while (root != null) {
 			try {
-				fileWriter.write(""+root.localIndex);
+				fileWriter.write(""+root.index);
 				fileWriter.write("[label=\""+root+"\"]\n");
 				if (root.C0!=null){
 					write(root.C0);
-					fileWriter.write(""+root.localIndex+"->"+root.C0.localIndex+
+					fileWriter.write(""+root.index+"->"+root.C0.index+
 							"[label=\"child\"]"+"\n");
 				}
 				if (root.C1!=null){
 					write(root.C1);
-					fileWriter.write(""+root.localIndex+"->"+root.C1.localIndex+
+					fileWriter.write(""+root.index+"->"+root.C1.index+
 							"[label=\"child\"]"+"\n");
 				}
 				if (root.C2!=null){
 					write(root.C2);
-					fileWriter.write(""+root.localIndex+"->"+root.C2.localIndex+
+					fileWriter.write(""+root.index+"->"+root.C2.index+
 							"[label=\"child\"]"+"\n");
 				}
 				if (root.sibling!=null){
-					fileWriter.write(""+root.localIndex+"->"+root.sibling.localIndex+
+					fileWriter.write(""+root.index+"->"+root.sibling.index+
 							"[label=\"sibling\"]"+"\n");
 				}
 			} catch (IOException e) {

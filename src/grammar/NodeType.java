@@ -31,5 +31,5 @@ public enum NodeType {
 	NE, 
 	ASSIGN, 
 	VOIDTYPESPEC,
-	INTTYPESPEC
+	INTTYPESPEC,
 }

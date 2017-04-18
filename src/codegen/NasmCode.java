@@ -147,6 +147,12 @@ public class NasmCode {
 				emitCode("setl\tal");
 			}else if (op.equals(NodeType.LE)){
 				emitCode("setle\tal");
+			}else if (op.equals(NodeType.NE)) {
+				emitCode("setne\tal");
+			} else if (op.equals(NodeType.GT)) {
+				emitCode("setg\tal");
+			}  else if (op.equals(NodeType.GE)) {
+				emitCode("setge\tal");
 			}
 			emitCode("movzx\teax, al");
 		}

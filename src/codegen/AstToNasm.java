@@ -128,6 +128,21 @@ public class AstToNasm {
 			genCode(node.C1, true);
 			binaryCode(1, 2, NodeType.LE, true);
 			break;
+		case NE:
+			genCode(node.C0, true);
+			genCode(node.C1, true);
+			binaryCode(1, 2, NodeType.NE, true);
+			break;
+		case GT:
+			genCode(node.C0, true);
+			genCode(node.C1, true);
+			binaryCode(1, 2, NodeType.GT, true);
+			break;
+		case GE:
+			genCode(node.C0, true);
+			genCode(node.C1, true);
+			binaryCode(1, 2, NodeType.GE, true);
+			break;
 		case MINUS:
 			genCode(node.C0, true);
 			genCode(node.C1, true);
@@ -158,10 +173,14 @@ public class AstToNasm {
 			symbol = currentSymbolTable.lookUp(node.strValue);
 			if (symbol == null) {
 				symbol = globalSymbolTable.lookUp(node.strValue);
+				if (signal){
 				if (symbol.entryType.equals(NodeType.ARRAYDECL)){
 					nc.code_push_global_array(Util.ELFHash(symbol.ID));
 				}else{
 					nc.code_push_global_var(Util.ELFHash(symbol.ID));
+				}
+				}else{
+					nc.code_lea_global(2, Util.ELFHash(symbol.ID), 0);
 				}
 			} else {
 				if (signal) {

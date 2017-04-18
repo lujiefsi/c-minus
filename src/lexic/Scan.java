@@ -204,6 +204,7 @@ public class Scan {
 		   if (traceScan) {
 			   System.out.println("\t"+lineNo+":"+currentToken+"\n");
 		   }
+  		   currentToken.setLineNo(lineNo);
 		   return currentToken;
 	}
 	
