@@ -1,6 +1,7 @@
 package semantic;
 
 import util.IO;
+import util.Process;
 import grammar.NodeType;
 import grammar.TreeNode;
 

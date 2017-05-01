@@ -1,9 +1,9 @@
 package ir;
 
 public class Quad {
-	private Operator operator;
-	private Operand operand1, operand2, operand3, operand4;
-	private int id_number;
+	public Operator operator;
+	public Operand operand1, operand2, operand3, operand4;
+	public int id_number;
 
 	Quad(int id, Operator operator) {
 		this.id_number = id;
@@ -41,4 +41,25 @@ public class Quad {
 		this.operand3 = operand3;
 		this.operand4 = operand4;
 	}
+	 public String toString() {
+	        StringBuffer s = new StringBuffer();
+	        s.append(id_number+"\t");
+	        s.append(operator+"\t");
+	        if (operand1 == null) {
+	            if (operand2 == null) return s.toString();
+	            s.append("    \t");
+	        } else {
+	            s.append(operand1.toString());
+	            if (operand2 == null) return s.toString();
+	            s.append(",\t");
+	        }
+	        s.append(operand2.toString());
+	        if (operand3 == null) return s.toString();
+	        s.append(",\t");
+	        s.append(operand3.toString());
+	        if (operand4 == null) return s.toString();
+	        s.append(",\t");
+	        s.append(operand4.toString());
+	        return s.toString();
+	    }
 }

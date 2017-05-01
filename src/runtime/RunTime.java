@@ -1,10 +1,10 @@
 package runtime;
 import grammar.NodeType;
 import grammar.TreeNode;
-import semantic.Process;
 import semantic.Symbol;
 import semantic.SymbolTable;
 import util.IO;
+import util.Process;
 public class RunTime {
 	private final int VARSIZE = 4;
 	TreeNode root;

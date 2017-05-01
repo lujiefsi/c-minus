@@ -1,5 +1,7 @@
 package cminus;
 
+import ir.AstToIR;
+
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -39,6 +41,10 @@ public class Main {
 		analysis.analysis();
 		RunTime runTime = new RunTime(root,analysis.getGlobalSymbolTable());
 		runTime.run();
+		AstToIR genIR = new AstToIR(root,analysis.getGlobalSymbolTable());
+		genIR.genIR(root);
+		genIR.dumpIR(args[0]+".ir");
+		genIR.dumpCFG(args[0]);
 		AstToNasm genNasm = new AstToNasm(args[1],analysis.getGlobalSymbolTable());
 		genNasm.genCode(root,false);
 		genNasm.close();
